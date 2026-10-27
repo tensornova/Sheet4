@@ -1,22 +1,16 @@
-name: Build and Release EXE
+name: Build Single EXE
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - 'v*'
-  workflow_dispatch:
-
-permissions:
-  contents: write
+  workflow_dispatch: # يتيح لك تشغيله بضغطة زر واحدة دون عمل Tag أو Commit جديد
 
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
-    - name: Checkout code
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
     - name: Set up Python
@@ -24,27 +18,19 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Install Requirements
       run: |
-        python -m pip install --upgrade pip
         pip install pyinstaller numpy matplotlib
 
-    - name: Build EXE using PyInstaller
+    - name: Build Single EXE File
       run: |
         pyinstaller --noconfirm --onefile --windowed --name "Linear_Solver" numerical5.py
 
-    # خطوة حفظ الملف كـ Artifact (للتحميل المباشر من صفحة Actions)
-    - name: Upload EXE as Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Linear_Solver_App
-        path: dist/Linear_Solver.exe
-
-    # خطوة رفع الملف إلى الـ Release
-    - name: Create or Update Release
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Upload Single EXE to Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: sheet5-exe
+        name: "Sheet 5 Single Executable"
         files: dist/Linear_Solver.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
