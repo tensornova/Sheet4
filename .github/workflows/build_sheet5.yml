@@ -27,7 +27,7 @@ jobs:
       run: |
         # --onefile: Creates a single executable file
         # --windowed: Hides the console window (GUI only)
-        pyinstaller --noconfirm --onefile --windowed --name "Linear_Solver" numerical5.py
+        pyinstaller --noconfirm --onefile --windowed --name "numerical5" numerical5.py
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
