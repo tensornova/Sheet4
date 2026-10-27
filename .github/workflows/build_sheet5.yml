@@ -2,8 +2,14 @@ name: Build and Release EXE
 
 on:
   push:
+    branches:
+      - main
     tags:
-      - 'v*' # Trigger the workflow only when pushing a version tag (e.g., v1.0)
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -25,11 +31,20 @@ jobs:
 
     - name: Build EXE using PyInstaller
       run: |
-        # --onefile: Creates a single executable file
-        # --windowed: Hides the console window (GUI only)
-        pyinstaller --noconfirm --onefile --windowed --name "numerical5" numerical5.py
+        pyinstaller --noconfirm --onefile --windowed --name "Linear_Solver" numerical5.py
 
-    - name: Create GitHub Release
+    # خطوة حفظ الملف كـ Artifact (للتحميل المباشر من صفحة Actions)
+    - name: Upload EXE as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Linear_Solver_App
+        path: dist/Linear_Solver.exe
+
+    # خطوة رفع الملف إلى الـ Release
+    - name: Create or Update Release
+      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
         files: dist/Linear_Solver.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
